@@ -1,0 +1,377 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Cookie Cats Gate Test</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout concept: a lab readout. One left-aligned column, a verdict first, then the evidence in the order a reviewer would ask for it.
+   Palette: cool paper, blue ink. Blue and orange belong to the two game versions and are used for nothing else. */
+:root{
+  color-scheme:light;
+  --paper:#f1f4f7; --surface:#ffffff; --ink:#14202b; --ink2:#46535f; --ink3:#6f7c88;
+  --rule:#d3dae1; --grid:#e5eaef;
+  --g30:#2a78d6; --g40:#eb6834;
+  --display:'Bricolage Grotesque','Segoe UI',system-ui,sans-serif;
+  --body:'Hanken Grotesk','Segoe UI',system-ui,sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+html{background:var(--paper)}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.55;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:40px 64px}
+.wrap{max-width:1040px;margin:0 auto}
+h1,h2,h3{font-family:var(--display);font-weight:700;letter-spacing:-.01em;line-height:1.1;margin:0;text-wrap:balance}
+h1{font-size:clamp(34px,5.4vw,56px)}
+h2{font-size:clamp(24px,3vw,30px);margin-bottom:14px}
+p{margin:0 0 14px;max-width:66ch}
+.eyebrow{font-family:var(--mono);font-size:12.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);margin-bottom:14px}
+.lede{font-size:19px;color:var(--ink2);margin-top:16px;max-width:60ch}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+header{padding-bottom:30px}
+
+/* verdict */
+.verdict{background:var(--surface);border-top:4px solid var(--ink);padding:26px 28px 24px;margin-bottom:46px}
+.verdict .say{font-family:var(--display);font-weight:700;font-size:clamp(26px,3.4vw,36px);line-height:1.1;margin-bottom:22px;text-wrap:balance}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0}
+.stat{padding:0 22px;border-left:1px solid var(--rule);min-width:0}
+.stat:first-child{padding-left:0;border-left:0}
+.stat .big{font-family:var(--mono);font-weight:500;font-size:clamp(26px,3vw,34px);letter-spacing:-.02em;line-height:1.15;font-variant-numeric:tabular-nums}
+.stat .big i{font-style:normal;display:inline-block;width:.35em}
+.stat .what{font-size:15px;color:var(--ink2);margin-top:6px}
+.verdict .foot{margin:22px 0 0;padding-top:16px;border-top:1px solid var(--rule);font-size:15.5px;color:var(--ink2);max-width:none}
+
+section{margin:0 0 54px}
+.fig{background:var(--surface);border:1px solid var(--rule);border-radius:6px;padding:20px 22px 16px;margin:18px 0 10px}
+.fig h3{font-size:19px;margin-bottom:4px}
+.fig .sub{font-size:14.5px;color:var(--ink3);margin:0 0 12px;max-width:none}
+.cap{font-size:15px;color:var(--ink2);max-width:70ch}
+.cols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px}
+.legend{display:flex;gap:18px;flex-wrap:wrap;font-size:14.5px;margin:0 0 6px}
+.legend span{display:inline-flex;align-items:center;gap:7px}
+.legend b{display:inline-block;width:16px;height:4px;border-radius:2px}
+.scroll{overflow-x:auto}
+.scroll svg{min-width:560px}
+svg{display:block;width:100%;height:auto}
+svg text{font-family:var(--body);fill:var(--ink2);font-size:13px}
+svg .mono{font-family:var(--mono);font-size:12.5px}
+svg .strong{fill:var(--ink);font-weight:600}
+svg .grid{stroke:var(--grid);stroke-width:1}
+svg .axis{stroke:var(--ink3);stroke-width:1}
+[data-tip]{cursor:default}
+[data-tip]:hover,[data-tip]:focus{outline:none;filter:brightness(1.08)}
+
+/* forest rows are plain HTML so labels stay readable at phone width */
+.forest{margin-top:6px}
+.frow{display:grid;grid-template-columns:200px minmax(0,1fr) 170px;gap:16px;align-items:center;padding:12px 0;border-top:1px solid var(--grid)}
+.frow:first-of-type{border-top:0}
+.flab{font-weight:600;font-size:15.5px;line-height:1.3}
+.flab small{display:block;font-weight:400;color:var(--ink3);font-size:13.5px}
+.fval{font-family:var(--mono);font-size:13px;line-height:1.45;color:var(--ink2)}
+.fval b{color:var(--ink);font-weight:500;font-size:14.5px}
+.track{position:relative;height:30px}
+.track .zero{position:absolute;top:0;bottom:0;width:1px;background:var(--ink)}
+.track .iv{position:absolute;top:14px;height:3px;background:var(--ink);border-radius:2px}
+.track .cap1,.track .cap2{position:absolute;top:8px;width:2px;height:15px;background:var(--ink)}
+.track .dot{position:absolute;top:8px;width:15px;height:15px;margin-left:-7.5px;border-radius:50%;border:2.5px solid var(--ink);background:var(--ink)}
+.track .dot.hollow{background:var(--surface)}
+.faxis{display:grid;grid-template-columns:200px minmax(0,1fr) 170px;gap:16px}
+.faxis .ticks{position:relative;height:22px;border-top:1px solid var(--ink3)}
+.faxis .ticks span{position:absolute;top:4px;transform:translateX(-50%);font-family:var(--mono);font-size:12px;color:var(--ink3)}
+.faxis .ticks span:first-child{transform:none}
+.faxis .left,.faxis .right{font-size:12.5px;color:var(--ink3);font-family:var(--mono)}
+.faxis .left{align-self:start}
+
+.facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px;margin:16px 0}
+.fact .k{font-family:var(--mono);font-size:26px;font-weight:500;letter-spacing:-.02em;line-height:1.2}
+.fact .d{font-size:14.5px;color:var(--ink2);margin-top:4px}
+.defs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px;margin:20px 0 0}
+.defs div{border-top:1px solid var(--ink);padding-top:10px;font-size:15px;color:var(--ink2)}
+.defs b{display:block;color:var(--ink);font-family:var(--display);font-size:16.5px;margin-bottom:2px}
+ul.plain{margin:0 0 14px;padding-left:1.2em;max-width:68ch}
+ul.plain li{margin-bottom:8px}
+table{border-collapse:collapse;width:100%;min-width:640px;font-size:14.5px}
+th,td{text-align:left;padding:9px 12px 9px 0;border-bottom:1px solid var(--grid);vertical-align:top}
+th{font-family:var(--mono);font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink3);font-weight:500;border-bottom:1px solid var(--ink)}
+td.num{font-size:13.5px;white-space:nowrap}
+pre{font-family:var(--mono);font-size:13.5px;background:var(--surface);border:1px solid var(--rule);border-radius:6px;padding:14px 16px;overflow-x:auto;margin:10px 0 14px}
+footer{border-top:1px solid var(--rule);padding-top:18px;font-size:14px;color:var(--ink3)}
+footer p{max-width:80ch}
+a{color:var(--ink);text-underline-offset:3px}
+#tip{position:fixed;z-index:20;pointer-events:none;background:var(--ink);color:#fff;font-size:13.5px;line-height:1.4;padding:8px 11px;border-radius:5px;max-width:260px;opacity:0;transition:opacity .08s}
+#tip b{font-family:var(--mono);font-weight:500;font-size:14.5px;display:block}
+#tip span{color:#c3ccd5}
+@media (max-width:760px){
+  body{padding-block:28px 48px}
+  .verdict{padding:20px 18px}
+  .stats{grid-template-columns:1fr;gap:16px}
+  .stat,.stat:first-child{padding:16px 0 0;border-left:0;border-top:1px solid var(--rule)}
+  .stat:first-child{padding-top:0;border-top:0}
+  .cols,.facts,.defs{grid-template-columns:1fr}
+  .frow{grid-template-columns:1fr;gap:6px}
+  .faxis{grid-template-columns:1fr}
+  .faxis .left,.faxis .right{display:none}
+  .fig{padding:16px 14px 12px}
+}
+@media (prefers-reduced-motion:reduce){#tip{transition:none}}
+</style>
+
+</head><body>
+<div class="wrap">
+<header>
+  <div class="eyebrow">A/B test analysis · Cookie Cats mobile game · 90,189 players</div>
+  <h1>Moving the gate from level 30 to level 40 cost the game returning players</h1>
+  <p class="lede">In Cookie Cats, players reach a gate that asks them to wait or pay before they can keep going. The studio tested moving the first gate from level 30 to level 40. This page reads that test and says what to do about it.</p>
+</header>
+
+<div class="verdict">
+  <div class="say">Keep the gate at level 30.</div>
+  <div class="stats">
+    <div class="stat"><div class="big">19.0%<i></i>→<i></i>18.2%</div><div class="what">Players back 7 days after install, gate 30 then gate 40. This was the main measure, chosen before looking at results.</div></div>
+    <div class="stat"><div class="big">−0.82 pts</div><div class="what">The change in 7-day retention. The true change is between −1.33 and −0.31 points (95% interval), or 4.3% fewer returning players.</div></div>
+    <div class="stat"><div class="big">≈820</div><div class="what">Fewer players back on day 7 for every 100,000 installs. The range is 310 to 1,330.</div></div>
+  </div>
+  <p class="foot">A gap this large would show up by chance about 1 time in 640 if the two versions were identical (p&nbsp;=&nbsp;0.0016, or 0.0031 after allowing for testing two retention measures). Day-1 retention also leaned lower, by −0.59 points, but its interval runs from −1.24 to +0.06, so it cannot rule out no change (p&nbsp;=&nbsp;0.074).</p>
+</div>
+
+<section id="setup">
+  <h2>How the test was set up</h2>
+  <p>90,189 new players were split into two groups. 44,700 saw the gate at level 30 and 45,489 saw it at level 40. For each player the data records whether they opened the game again one day and seven days after installing, and how many rounds they played in the first 14 days.</p>
+  <div class="defs">
+    <div><b>Retention</b>The share of players who come back on a given day after install. Seven-day retention is the main measure here.</div>
+    <div><b>95% interval</b>The range of true differences the data cannot rule out. If it includes zero, the data cannot rule out no change at all.</div>
+    <div><b>p-value</b>How often a gap this large would appear by chance if the two versions were really identical. Smaller means less likely to be luck.</div>
+  </div>
+</section>
+
+<section id="retention">
+  <h2>Retention by version</h2>
+  <div class="fig">
+    <h3>Share of players who came back</h3>
+    <p class="sub">Bars start at zero. Whiskers show the 95% interval for each version. Hover a bar for counts.</p>
+    <div class="legend"><span><b style="background:var(--g30)"></b>Gate at level 30</span><span><b style="background:var(--g40)"></b>Gate at level 40</span></div>
+    <div class="cols" id="bars"></div>
+  </div>
+  <p class="cap">The bars look close because the change is small next to how many players return. The next chart zooms in on the gap.</p>
+</section>
+
+<section id="effect">
+  <h2>How big is the change</h2>
+  <div class="fig">
+    <h3>Gate 40 minus gate 30, in percentage points</h3>
+    <p class="sub">A dot left of the zero line means fewer players came back with the later gate. A filled dot means the interval stays clear of zero.</p>
+    <div class="forest" id="forest-main"></div>
+  </div>
+  <p class="cap">Seven-day retention fell by about 0.82 points, and the whole interval sits below zero. Rerunning the comparison by resampling the players (20,000 times) and by shuffling the version labels both gave the same answer.</p>
+</section>
+
+<section id="where">
+  <h2>Where the drop shows up</h2>
+  <div class="fig">
+    <h3>Seven-day retention difference, by how many rounds a player ended up playing</h3>
+    <p class="sub">Gate 40 minus gate 30, in percentage points. Players are grouped by rounds played in their first 14 days.</p>
+    <div class="forest" id="forest-bands"></div>
+  </div>
+  <p class="cap">The loss is concentrated in players who played 30 to 99 rounds, which is the range where players are most likely to be reaching the gate. They returned 2.17 points less often (27.8% against 25.7%). The other groups show no clear change. Rounds played is counted after the gate can change behavior, so read these groups as a clue about where to look next, not as proof. The 30 to 99 round result holds after adjusting for eight comparisons (p&nbsp;=&nbsp;0.0033).</p>
+</section>
+
+<section id="rounds">
+  <h2>Did players play less overall</h2>
+  <div class="fig">
+    <h3>Rounds played in the first 14 days</h3>
+    <p class="sub">Share of each version's players in each range of rounds.</p>
+    <div class="legend"><span><b style="background:var(--g30)"></b>Gate at level 30</span><span><b style="background:var(--g40)"></b>Gate at level 40</span></div>
+    <div class="scroll"><div id="hist"></div></div>
+  </div>
+  <div class="facts">
+    <div class="fact"><div class="k">17 vs 16</div><div class="d">Median rounds, gate 30 then gate 40. The typical player plays about the same amount.</div></div>
+    <div class="fact"><div class="k">52.5 vs 51.3</div><div class="d">Mean rounds. One player in gate 30 logged 49,854 rounds. Without that player the means differ by 0.04 rounds.</div></div>
+    <div class="fact"><div class="k">p&nbsp;=&nbsp;0.050</div><div class="d">A rank-based test of the whole distribution, which one extreme player cannot distort. It sits right at the usual 0.05 line, so there is a hint of lower play, not a clear one.</div></div>
+  </div>
+</section>
+
+<section id="power">
+  <h2>Could this test see small changes</h2>
+  <div class="fig">
+    <h3>Chance of detecting a real change in 7-day retention, with this many players</h3>
+    <p class="sub">Each group has about 45,100 players. Curve from the standard formula. Dots come from simulating the whole test 4,000 times.</p>
+    <div class="scroll"><div id="power-chart"></div></div>
+  </div>
+  <p class="cap">With this many players the test reliably catches changes of about 0.73 points or more, and the observed change of 0.82 points was just above that line. A change of 0.4 points would be missed about two times in three. Catching a 0.5 point change 80% of the time takes about 96,700 players in each group, and a 0.3 point change takes about 268,600.</p>
+</section>
+
+<section id="limits">
+  <h2>What could change the answer</h2>
+  <ul class="plain">
+    <li><b>The groups are slightly uneven.</b> Gate 40 received 50.4% of players instead of 50% (p&nbsp;=&nbsp;0.0086). A strict team treats anything below 0.001 as a broken test, so this is not an alarm, but it is worth checking in the assignment logs. The dataset has none, so it cannot be explained here.</li>
+    <li><b>Retention is the only outcome.</b> The data has no revenue or ad views. If a later gate earns enough to offset about 820 fewer returning players per 100,000 installs, the decision could change, and this data cannot say.</li>
+    <li><b>Only 14 days of play.</b> A seven-day gap may grow, shrink or fade by day 30.</li>
+    <li><b>One test, one gate position.</b> It says level 40 is worse than level 30. It does not say level 30 is the best place for the gate.</li>
+  </ul>
+  <h3 style="font-size:19px;margin:22px 0 8px">What to test next</h3>
+  <ul class="plain">
+    <li>Track revenue and ad views alongside retention, so the trade-off is visible.</li>
+    <li>Try a gate earlier than level 30, such as level 20, with day-14 and day-30 retention as outcomes.</li>
+    <li>Plan the sample size first. About 96,700 players per group detects a 0.5 point change in 7-day retention.</li>
+    <li>Log when each player is assigned, so the group split can be audited.</li>
+  </ul>
+</section>
+
+<section id="table">
+  <h2>All results</h2>
+  <div class="scroll">
+  <table>
+    <thead><tr><th>Measure</th><th>Gate 30</th><th>Gate 40</th><th>Difference</th><th>95% interval</th><th>p</th><th>p adjusted</th></tr></thead>
+    <tbody>
+      <tr><td>7-day retention (main)</td><td class="num">19.0%</td><td class="num">18.2%</td><td class="num">−0.82 pts</td><td class="num">−1.33 to −0.31</td><td class="num">0.0016</td><td class="num">0.0031</td></tr>
+      <tr><td>1-day retention</td><td class="num">44.8%</td><td class="num">44.2%</td><td class="num">−0.59 pts</td><td class="num">−1.24 to +0.06</td><td class="num">0.074</td><td class="num">0.074</td></tr>
+      <tr><td>Mean rounds played</td><td class="num">52.5</td><td class="num">51.3</td><td class="num">−1.16</td><td class="num">−4.09 to +0.95</td><td class="num">0.050 (rank test)</td><td class="num">not applicable</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<section id="method">
+  <h2>How it was done</h2>
+  <p>The plan was fixed before the results were read. Seven-day retention is the main measure, one-day retention is secondary, and rounds played is a check that the later gate did not change how much people play. Players are the unit, each player appears once, and no one was removed. The SQL (DuckDB) builds the player table and the summaries. Python runs the tests, a two-proportion z-test for retention, resampling for the intervals, a rank test for rounds, Holm adjustment for several comparisons, and a simulation for power. A separate script recomputes every figure here with different code and a shuffling test, and all 45 comparisons matched.</p>
+</section>
+
+<footer>
+  <p>Data is the public Cookie Cats A/B test dataset on Kaggle (Mobile Games A/B Testing). Check the dataset page for its licence. This is an analysis of a past experiment, not a test run by the author.</p>
+  <p><a href="https://github.com/rojinta/cookie-cats-ab-test">Code and results on GitHub</a></p>
+</footer>
+</div>
+<div id="tip" role="status"></div>
+
+<script>
+const D = {"n_a": 44700, "n_b": 45489, "tests": {"ret_7": {"p_a": 0.19020134228187918, "p_b": 0.18200004396667327, "diff": -0.008201298315205913, "ci_lo": -0.013281552418885545, "ci_hi": -0.0031210442115262808, "z": -3.164358912748191, "p_value": 0.001554249975614329, "rel_change": -0.043119034896460164, "metric": "ret_7", "label": "7-day retention", "x_a": 8502, "x_b": 8279, "wilson_a_lo": 0.18658979684366292, "wilson_a_hi": 0.19386613051747012, "wilson_b_lo": 0.17848120097823006, "wilson_b_hi": 0.18557259139286592, "boot_lo": -0.013302730758273151, "boot_hi": -0.003134379268031621, "p_holm": 0.003108499951228658}, "ret_1": {"p_a": 0.4481879194630872, "p_b": 0.44228274967574577, "diff": -0.005905169787341458, "ci_lo": -0.012392439449445217, "ci_hi": 0.0005820998747623016, "z": -1.7840862247974725, "p_value": 0.07440965529691913, "rel_change": -0.01317565585974659, "metric": "ret_1", "label": "1-day retention", "x_a": 20034, "x_b": 20119, "wilson_a_lo": 0.44358236514774474, "wilson_a_hi": 0.45280237833639625, "wilson_b_lo": 0.43772374727049607, "wilson_b_hi": 0.44685149948007, "boot_lo": -0.012313479798420198, "boot_hi": 0.0006204070502478381, "p_holm": 0.07440965529691913}}, "bands": [{"p_a": 0.008260196179659268, "p_b": 0.006319883325230919, "diff": -0.0019403128544283488, "ci_lo": -0.0072293708454695465, "ci_hi": 0.003348745136612849, "z": -0.7218336976760812, "p_value": 0.4703967288770825, "rel_change": -0.23489912493923196, "band": "0 rounds", "metric": "ret_7", "n_a": 1937, "n_b": 2057, "p_holm": 1.0}, {"p_a": 0.021166752710376872, "p_b": 0.02236266407389402, "diff": 0.0011959113635171478, "ci_lo": -0.007854936790697323, "ci_hi": 0.010246759517731619, "z": 0.25876387560633607, "p_value": 0.7958174318364288, "rel_change": 0.056499519783724764, "band": "0 rounds", "metric": "ret_1", "n_a": 1937, "n_b": 2057, "p_holm": 1.0}, {"p_a": 0.045121997931589226, "p_b": 0.041836011782691376, "diff": -0.00328598614889785, "ci_lo": -0.006761837220736429, "ci_hi": 0.00018986492294072914, "z": -1.8537421033414183, "p_value": 0.06377606505384434, "rel_change": -0.07282448250363004, "band": "1 to 29 rounds", "metric": "ret_7", "n_a": 26107, "n_b": 26819, "p_holm": 0.44643245537691034}, {"p_a": 0.25479756387175856, "p_b": 0.251761810656624, "diff": -0.003035753215134551, "ci_lo": -0.010446652974034458, "ci_hi": 0.004375146543765355, "z": -0.8029048995442866, "p_value": 0.4220297039326312, "rel_change": -0.011914372998724852, "band": "1 to 29 rounds", "metric": "ret_1", "n_a": 26107, "n_b": 26819, "p_holm": 1.0}, {"p_a": 0.711413748378729, "p_b": 0.7103024574669187, "diff": -0.001111290911810281, "ci_lo": -0.016997976932100794, "ci_hi": 0.014775395108480232, "z": -0.13709925494059233, "p_value": 0.890952341379925, "rel_change": -0.0015620880455892918, "band": "100 or more rounds", "metric": "ret_7", "n_a": 6168, "n_b": 6348, "p_holm": 1.0}, {"p_a": 0.9020752269779507, "p_b": 0.8982356647763075, "diff": -0.0038395622016432762, "ci_lo": -0.014343420986523194, "ci_hi": 0.006664296583236641, "z": -0.716251008513614, "p_value": 0.47383637177223403, "rel_change": -0.004256365862641216, "band": "100 or more rounds", "metric": "ret_1", "n_a": 6168, "n_b": 6348, "p_holm": 1.0}, {"p_a": 0.2784134248665141, "p_b": 0.25669751583049194, "diff": -0.021715909036022163, "ci_lo": -0.0337570096116094, "ci_hi": -0.009674808460434925, "z": -3.5327184079206275, "p_value": 0.000411310321635323, "rel_change": -0.07799878560609605, "band": "30 to 99 rounds", "metric": "ret_7", "n_a": 10488, "n_b": 10265, "p_holm": 0.003290482573082584}, {"p_a": 0.7415141113653699, "p_b": 0.7422308816366293, "diff": 0.0007167702712593815, "ci_lo": -0.011191323221258025, "ci_hi": 0.012624863763776788, "z": 0.11797268641795201, "p_value": 0.9060892998070703, "rel_change": 0.0009666306551328782, "band": "30 to 99 rounds", "metric": "ret_1", "n_a": 10488, "n_b": 10265, "p_holm": 1.0}], "power": {"baseline": 0.19020134228187918, "n_per_arm": 45094.5, "mde_pp": 0.7322381670251817, "simulated": {"0.4": 0.323, "0.82": 0.87425, "1.2": 0.9965}, "need_n": {"0.3": 268650, "0.5": 96714, "0.75": 42984, "1.0": 24179}}, "curve": [{"true_diff_pp": 0.0, "power": 0.05}, {"true_diff_pp": 0.05, "power": 0.0541985155612361}, {"true_diff_pp": 0.1, "power": 0.0668978184879665}, {"true_diff_pp": 0.15, "power": 0.0883872931077832}, {"true_diff_pp": 0.2, "power": 0.1190202397626048}, {"true_diff_pp": 0.25, "power": 0.1590284567743554}, {"true_diff_pp": 0.3, "power": 0.2083202603693731}, {"true_diff_pp": 0.35, "power": 0.2663061296220525}, {"true_diff_pp": 0.4, "power": 0.3317932715052968}, {"true_diff_pp": 0.45, "power": 0.4029784765446364}, {"true_diff_pp": 0.5, "power": 0.4775492449845728}, {"true_diff_pp": 0.55, "power": 0.552880261544102}, {"true_diff_pp": 0.6, "power": 0.6262914355558339}, {"true_diff_pp": 0.65, "power": 0.695320418142649}, {"true_diff_pp": 0.7, "power": 0.7579603715684474}, {"true_diff_pp": 0.75, "power": 0.8128231981730324}, {"true_diff_pp": 0.8, "power": 0.859206458323238}, {"true_diff_pp": 0.85, "power": 0.8970635220438095}, {"true_diff_pp": 0.9, "power": 0.9268953336248642}, {"true_diff_pp": 0.95, "power": 0.9495941317296824}, {"true_diff_pp": 1.0, "power": 0.9662727274337586}, {"true_diff_pp": 1.05, "power": 0.9781083708489876}, {"true_diff_pp": 1.1, "power": 0.986220634199376}, {"true_diff_pp": 1.15, "power": 0.9915915909247636}, {"true_diff_pp": 1.2, "power": 0.9950268702552144}, {"true_diff_pp": 1.25, "power": 0.9971496957210096}, {"true_diff_pp": 1.3, "power": 0.9984171989892848}, {"true_diff_pp": 1.35, "power": 0.9991485180497548}, {"true_diff_pp": 1.4, "power": 0.9995562998588138}, {"true_diff_pp": 1.45, "power": 0.9997760614584212}, {"true_diff_pp": 1.5, "power": 0.999890538483326}, {"true_diff_pp": 1.55, "power": 0.9999481841550396}, {"true_diff_pp": 1.6, "power": 0.999976247272122}], "hist": [{"version": "gate_30", "bucket": 0, "players": 1937}, {"version": "gate_40", "bucket": 0, "players": 2057}, {"version": "gate_30", "bucket": 1, "players": 2749}, {"version": "gate_40", "bucket": 1, "players": 2789}, {"version": "gate_30", "bucket": 2, "players": 4097}, {"version": "gate_40", "bucket": 2, "players": 4467}, {"version": "gate_30", "bucket": 3, "players": 5892}, {"version": "gate_40", "bucket": 3, "players": 5969}, {"version": "gate_30", "bucket": 4, "players": 6836}, {"version": "gate_40", "bucket": 4, "players": 6979}, {"version": "gate_30", "bucket": 5, "players": 7110}, {"version": "gate_40", "bucket": 5, "players": 7294}, {"version": "gate_30", "bucket": 6, "players": 6846}, {"version": "gate_40", "bucket": 6, "players": 6276}, {"version": "gate_30", "bucket": 7, "players": 4474}, {"version": "gate_40", "bucket": 7, "players": 4883}, {"version": "gate_30", "bucket": 8, "players": 2961}, {"version": "gate_40", "bucket": 8, "players": 2989}, {"version": "gate_30", "bucket": 9, "players": 1398}, {"version": "gate_40", "bucket": 9, "players": 1376}, {"version": "gate_30", "bucket": 10, "players": 350}, {"version": "gate_40", "bucket": 10, "players": 351}, {"version": "gate_30", "bucket": 11, "players": 45}, {"version": "gate_40", "bucket": 11, "players": 55}, {"version": "gate_30", "bucket": 12, "players": 4}, {"version": "gate_40", "bucket": 12, "players": 4}, {"version": "gate_30", "bucket": 16, "players": 1}]};
+const C30 = '#2a78d6', C40 = '#eb6834';
+const NS = 'http://www.w3.org/2000/svg';
+const $ = id => document.getElementById(id);
+const pct = (x, d = 1) => (x * 100).toFixed(d) + '%';
+const sgn = (x, d = 2) => (x < 0 ? '−' : '+') + Math.abs(x).toFixed(d);
+
+/* ---------- tooltip ---------- */
+const tip = $('tip');
+function showTip(el, ev) {
+  tip.textContent = '';
+  const b = document.createElement('b'); b.textContent = el.dataset.v || '';
+  const s = document.createElement('span'); s.textContent = el.dataset.tip;
+  tip.append(b, s);
+  tip.style.opacity = 1;
+  const r = tip.getBoundingClientRect();
+  let x = ev.clientX + 14, y = ev.clientY + 14;
+  if (x + r.width > innerWidth - 8) x = ev.clientX - r.width - 14;
+  if (y + r.height > innerHeight - 8) y = ev.clientY - r.height - 14;
+  tip.style.left = Math.max(8, x) + 'px'; tip.style.top = Math.max(8, y) + 'px';
+}
+document.addEventListener('pointermove', e => { const el = e.target.closest('[data-tip]'); if (el) showTip(el, e); else tip.style.opacity = 0; });
+document.addEventListener('pointerleave', () => tip.style.opacity = 0);
+document.addEventListener('focusin', e => { const el = e.target.closest('[data-tip]'); if (el) { const r = el.getBoundingClientRect(); showTip(el, { clientX: r.left + r.width / 2, clientY: r.top }); } });
+document.addEventListener('focusout', () => tip.style.opacity = 0);
+
+/* ---------- bar panels with intervals ---------- */
+function barPanel(key, title) {
+  const T = D.tests[key];
+  const W = 340, H = 310, L = 46, R = 12, Tp = 30, B = 44;
+  const pw = W - L - R, ph = H - Tp - B, ymax = 0.5;
+  const y = v => Tp + ph - (v / ymax) * ph;
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${title}">`;
+  for (let t = 0; t <= 0.5001; t += 0.1) {
+    s += `<line class="grid" x1="${L}" x2="${W - R}" y1="${y(t)}" y2="${y(t)}"/><text x="${L - 8}" y="${y(t) + 4}" text-anchor="end" class="mono">${Math.round(t * 100)}%</text>`;
+  }
+  s += `<text x="${L}" y="16" class="strong" style="font-size:15px">${title}</text>`;
+  const bars = [
+    { n: 'Gate 30', c: C30, p: T.p_a, lo: T.wilson_a_lo, hi: T.wilson_a_hi, x: T.x_a, N: D.n_a },
+    { n: 'Gate 40', c: C40, p: T.p_b, lo: T.wilson_b_lo, hi: T.wilson_b_hi, x: T.x_b, N: D.n_b }];
+  const bw = 78, gap = 36, x0 = L + (pw - (2 * bw + gap)) / 2;
+  bars.forEach((b, i) => {
+    const x = x0 + i * (bw + gap), top = y(b.p), base = y(0), r = 4;
+    const tipText = `${b.x.toLocaleString('en-US')} of ${b.N.toLocaleString('en-US')} players. 95% interval ${pct(b.lo, 2)} to ${pct(b.hi, 2)}.`;
+    s += `<path tabindex="0" data-tip="${tipText}" data-v="${b.n}: ${pct(b.p, 2)}" fill="${b.c}" d="M${x},${base} V${top + r} Q${x},${top} ${x + r},${top} H${x + bw - r} Q${x + bw},${top} ${x + bw},${top + r} V${base} Z"/>`;
+    const cx = x + bw / 2;
+    s += `<line x1="${cx}" x2="${cx}" y1="${y(b.lo)}" y2="${y(b.hi)}" stroke="#14202b" stroke-width="1.6"/><line x1="${cx - 6}" x2="${cx + 6}" y1="${y(b.lo)}" y2="${y(b.lo)}" stroke="#14202b" stroke-width="1.6"/><line x1="${cx - 6}" x2="${cx + 6}" y1="${y(b.hi)}" y2="${y(b.hi)}" stroke="#14202b" stroke-width="1.6"/>`;
+    s += `<text x="${cx}" y="${y(b.hi) - 8}" text-anchor="middle" class="mono strong" style="font-size:14px">${pct(b.p)}</text>`;
+    s += `<text x="${cx}" y="${H - 16}" text-anchor="middle" style="font-size:14px">${b.n}</text>`;
+  });
+  s += `<line class="axis" x1="${L}" x2="${W - R}" y1="${y(0)}" y2="${y(0)}"/></svg>`;
+  return s;
+}
+$('bars').innerHTML = barPanel('ret_7', '7-day retention') + barPanel('ret_1', '1-day retention');
+
+/* ---------- forest rows (HTML, so they scale) ---------- */
+function forest(el, rows, min, max, ticks, leftNote, rightNote) {
+  const pos = v => ((v - min) / (max - min)) * 100;
+  let h = '';
+  rows.forEach(r => {
+    const sig = r.lo > 0 || r.hi < 0;
+    const tipText = `${r.sub || ''} Interval ${sgn(r.lo)} to ${sgn(r.hi)} points.`.trim();
+    h += `<div class="frow"><div class="flab">${r.label}<small>${r.sub || ''}</small></div>
+      <div class="track" tabindex="0" data-tip="${tipText}" data-v="${r.label}: ${sgn(r.d)} points">
+        <div class="zero" style="left:${pos(0)}%"></div>
+        <div class="iv" style="left:${pos(r.lo)}%;width:${pos(r.hi) - pos(r.lo)}%"></div>
+        <div class="cap1" style="left:${pos(r.lo)}%"></div><div class="cap2" style="left:${pos(r.hi)}%"></div>
+        <div class="dot ${sig ? '' : 'hollow'}" style="left:${pos(r.d)}%"></div></div>
+      <div class="fval"><b>${sgn(r.d)} pts</b><br>${sgn(r.lo)} to ${sgn(r.hi)}<br>p ${r.p.startsWith('<') ? '' : '= '}${r.p}${r.padj ? '<br>adjusted p ' + (r.padj.startsWith('<') ? '' : '= ') + r.padj : ''}</div></div>`;
+  });
+  h += `<div class="faxis"><div class="left">${leftNote || ''}</div><div class="ticks">${ticks.map(t => `<span style="left:${pos(t)}%">${t > 0 ? '+' : t < 0 ? '−' : ''}${Math.abs(t)}</span>`).join('')}</div><div class="right"></div></div>`;
+  el.innerHTML = h;
+}
+const fp = p => p < 0.001 ? '<0.001' : p < 0.01 ? p.toFixed(4).replace(/0+$/, '') : p.toFixed(3);
+const t7 = D.tests.ret_7, t1 = D.tests.ret_1;
+forest($('forest-main'), [
+  { label: '7-day retention', sub: 'Main measure', d: t7.diff * 100, lo: t7.ci_lo * 100, hi: t7.ci_hi * 100, p: fp(t7.p_value), padj: fp(t7.p_holm) },
+  { label: '1-day retention', sub: 'Secondary measure', d: t1.diff * 100, lo: t1.ci_lo * 100, hi: t1.ci_hi * 100, p: fp(t1.p_value), padj: fp(t1.p_holm) }
+], -2, 1, [-2, -1, 0, 1], 'Percentage points');
+const order = ['0 rounds', '1 to 29 rounds', '30 to 99 rounds', '100 or more rounds'];
+const bandRows = order.map(b => D.bands.find(x => x.band === b && x.metric === 'ret_7')).map(r => ({
+  label: r.band.replace('0 rounds', 'No rounds played').replace('100 or more rounds', '100 or more rounds'),
+  sub: `${(r.n_a + r.n_b).toLocaleString('en-US')} players`, d: r.diff * 100, lo: r.ci_lo * 100, hi: r.ci_hi * 100, p: fp(r.p_value), padj: fp(r.p_holm) }));
+forest($('forest-bands'), bandRows, -4, 2, [-4, -3, -2, -1, 0, 1, 2], 'Percentage points');
+
+/* ---------- rounds histogram ---------- */
+(function () {
+  const labels = ['0', '1', '2–3', '4–7', '8–15', '16–31', '32–63', '64–127', '128–255', '256–511', '512+'];
+  const tot = { gate_30: D.n_a, gate_40: D.n_b };
+  const share = { gate_30: new Array(11).fill(0), gate_40: new Array(11).fill(0) };
+  D.hist.forEach(r => { const i = Math.min(r.bucket, 10); share[r.version][i] += r.players; });
+  const W = 700, H = 300, L = 48, R = 10, Tp = 14, B = 52, pw = W - L - R, ph = H - Tp - B, ymax = 0.2;
+  const y = v => Tp + ph - (v / ymax) * ph;
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Share of players by rounds played">`;
+  for (let t = 0; t <= 0.2001; t += 0.05) s += `<line class="grid" x1="${L}" x2="${W - R}" y1="${y(t)}" y2="${y(t)}"/><text x="${L - 8}" y="${y(t) + 4}" text-anchor="end" class="mono">${Math.round(t * 100)}%</text>`;
+  const gw = pw / 11, bw = Math.min(22, gw / 2 - 3);
+  labels.forEach((lb, i) => {
+    const cx = L + gw * i + gw / 2;
+    [['gate_30', C30, -1], ['gate_40', C40, 1]].forEach(([v, c, sd]) => {
+      const val = share[v][i] / tot[v], x = cx + (sd < 0 ? -bw - 1 : 1), top = y(val), base = y(0), r = 3;
+      const name = v === 'gate_30' ? 'Gate 30' : 'Gate 40';
+      s += `<path tabindex="0" data-tip="${share[v][i].toLocaleString('en-US')} players played ${lb} rounds." data-v="${name}: ${pct(val)}" fill="${c}" d="M${x},${base} V${top + r} Q${x},${top} ${x + r},${top} H${x + bw - r} Q${x + bw},${top} ${x + bw},${top + r} V${base} Z"/>`;
+    });
+    s += `<text x="${cx}" y="${H - 28}" text-anchor="middle" class="mono" style="font-size:11.5px">${lb}</text>`;
+  });
+  s += `<line class="axis" x1="${L}" x2="${W - R}" y1="${y(0)}" y2="${y(0)}"/><text x="${L + pw / 2}" y="${H - 6}" text-anchor="middle" style="font-size:13px">Rounds played in the first 14 days</text></svg>`;
+  $('hist').innerHTML = s;
+})();
+
+/* ---------- power curve ---------- */
+(function () {
+  const W = 700, H = 320, L = 52, R = 14, Tp = 18, B = 52, pw = W - L - R, ph = H - Tp - B;
+  const x = v => L + (v / 1.6) * pw, y = v => Tp + ph - v * ph;
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Power by size of true change">`;
+  for (let t = 0; t <= 1.001; t += 0.2) s += `<line class="grid" x1="${L}" x2="${W - R}" y1="${y(t)}" y2="${y(t)}"/><text x="${L - 8}" y="${y(t) + 4}" text-anchor="end" class="mono">${Math.round(t * 100)}%</text>`;
+  for (let t = 0; t <= 1.601; t += 0.4) s += `<text x="${x(t)}" y="${H - 28}" text-anchor="middle" class="mono">${t.toFixed(1)}</text>`;
+  s += `<text x="${L + pw / 2}" y="${H - 6}" text-anchor="middle" style="font-size:13px">True drop in 7-day retention, in percentage points</text>`;
+  const m = D.power.mde_pp;
+  s += `<line x1="${L}" x2="${W - R}" y1="${y(0.8)}" y2="${y(0.8)}" stroke="#6f7c88" stroke-dasharray="5 4"/><text x="${W - R}" y="${y(0.8) - 7}" text-anchor="end" style="font-size:12.5px">80% chance of detecting</text>`;
+  s += `<line x1="${x(m)}" x2="${x(m)}" y1="${y(0)}" y2="${y(0.8)}" stroke="#6f7c88" stroke-dasharray="5 4"/><text x="${x(m) + 7}" y="${y(0.8) + 18}" style="font-size:12.5px">${m.toFixed(2)} points</text>`;
+  s += `<path fill="none" stroke="#14202b" stroke-width="2.2" stroke-linejoin="round" d="${D.curve.map((r, i) => (i ? 'L' : 'M') + x(r.true_diff_pp) + ',' + y(r.power)).join(' ')}"/>`;
+  [[0.4, D.power.simulated['0.4'], 'a 0.4 point drop'], [D.tests.ret_7.diff * -100, D.power.simulated['0.82'], 'the observed drop']].forEach(([d, p, lb]) => {
+    s += `<circle tabindex="0" cx="${x(d)}" cy="${y(p)}" r="6.5" fill="#fff" stroke="#14202b" stroke-width="2.5" data-tip="Simulated chance that the test flags ${lb}." data-v="${pct(p, 0)} at ${d.toFixed(2)} points"/>`;
+    s += d < 0.5
+      ? `<text x="${x(d) + 12}" y="${y(p) + 4}" text-anchor="start" class="mono strong" style="font-size:13px">${pct(p, 0)}</text>`
+      : `<text x="${x(d)}" y="${y(p) - 15}" text-anchor="middle" class="mono strong" style="font-size:13px">${pct(p, 0)}</text>`;
+  });
+  s += `<line class="axis" x1="${L}" x2="${W - R}" y1="${y(0)}" y2="${y(0)}"/></svg>`;
+  $('power-chart').innerHTML = s;
+})();
+</script>
+</body></html>

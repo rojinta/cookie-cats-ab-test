@@ -1,0 +1,9 @@
+version,rounds_band,players,ret_1_players,ret_7_players,ret_1_pct,ret_7_pct
+gate_30,0 rounds,1937,41,16,2.117,0.826
+gate_40,0 rounds,2057,46,13,2.236,0.632
+gate_30,1 to 29 rounds,26107,6652,1178,25.48,4.512
+gate_40,1 to 29 rounds,26819,6752,1122,25.176,4.184
+gate_30,100 or more rounds,6168,5564,4388,90.208,71.141
+gate_40,100 or more rounds,6348,5702,4509,89.824,71.03
+gate_30,30 to 99 rounds,10488,7777,2920,74.151,27.841
+gate_40,30 to 99 rounds,10265,7619,2635,74.223,25.67

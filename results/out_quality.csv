@@ -1,0 +1,9 @@
+check_name,value
+rows,90189
+distinct players,90189
+missing values,0
+unexpected version labels,0
+negative rounds,0
+players with zero rounds,3994
+most rounds by one player,49854
+back on day 7 but not day 1,3599

@@ -1,0 +1,47 @@
+OK   players, gate 30                                        recomputed=44700 reported=44700
+OK   players, gate 40                                        recomputed=45489 reported=45489
+OK   split check p value                                     recomputed=0.00860799 reported=0.00860799
+OK   ret_7 rate gate 30                                      recomputed=0.190201 reported=0.190201
+OK   ret_7 rate gate 40                                      recomputed=0.182 reported=0.182
+OK   ret_7 z statistic                                       recomputed=-3.16436 reported=-3.16436
+OK   ret_7 p value                                           recomputed=0.00155425 reported=0.00155425
+OK   ret_7 interval low                                      recomputed=-0.0132816 reported=-0.0132816
+OK   ret_7 interval high                                     recomputed=-0.00312104 reported=-0.00312104
+OK   ret_7 permutation p (20,000 shuffles)                   recomputed=0.00179991 reported=0.00155425
+OK   ret_1 rate gate 30                                      recomputed=0.448188 reported=0.448188
+OK   ret_1 rate gate 40                                      recomputed=0.442283 reported=0.442283
+OK   ret_1 z statistic                                       recomputed=-1.78409 reported=-1.78409
+OK   ret_1 p value                                           recomputed=0.0744097 reported=0.0744097
+OK   ret_1 interval low                                      recomputed=-0.0123924 reported=-0.0123924
+OK   ret_1 interval high                                     recomputed=0.0005821 reported=0.0005821
+OK   ret_1 permutation p (20,000 shuffles)                   recomputed=0.0744463 reported=0.0744097
+OK   Holm adjusted p, smaller                                recomputed=0.0031085 reported=0.0031085
+OK   Holm adjusted p, larger                                 recomputed=0.0744097 reported=0.0744097
+OK   fewer returning players per 100,000, day 7              recomputed=-820.13 reported=-820.13
+OK   mean rounds gate 30                                     recomputed=52.4563 reported=52.4563
+OK   mean rounds gate 40                                     recomputed=51.2988 reported=51.2988
+OK   median rounds gate 30                                   recomputed=17 reported=17
+OK   median rounds gate 40                                   recomputed=16 reported=16
+OK   Mann-Whitney p                                          recomputed=0.0502088 reported=0.0502088
+OK   mean rounds gate 30 without the top player              recomputed=51.3421 reported=51.3421
+OK   0 rounds ret_7 difference                               recomputed=-0.00194031 reported=-0.00194031
+OK   0 rounds ret_7 p value                                  recomputed=0.470397 reported=0.470397
+OK   0 rounds ret_1 difference                               recomputed=0.00119591 reported=0.00119591
+OK   0 rounds ret_1 p value                                  recomputed=0.795817 reported=0.795817
+OK   1 to 29 rounds ret_7 difference                         recomputed=-0.00328599 reported=-0.00328599
+OK   1 to 29 rounds ret_7 p value                            recomputed=0.0637761 reported=0.0637761
+OK   1 to 29 rounds ret_1 difference                         recomputed=-0.00303575 reported=-0.00303575
+OK   1 to 29 rounds ret_1 p value                            recomputed=0.42203 reported=0.42203
+OK   100 or more rounds ret_7 difference                     recomputed=-0.00111129 reported=-0.00111129
+OK   100 or more rounds ret_7 p value                        recomputed=0.890952 reported=0.890952
+OK   100 or more rounds ret_1 difference                     recomputed=-0.00383956 reported=-0.00383956
+OK   100 or more rounds ret_1 p value                        recomputed=0.473836 reported=0.473836
+OK   30 to 99 rounds ret_7 difference                        recomputed=-0.0217159 reported=-0.0217159
+OK   30 to 99 rounds ret_7 p value                           recomputed=0.00041131 reported=0.00041131
+OK   30 to 99 rounds ret_1 difference                        recomputed=0.00071677 reported=0.00071677
+OK   30 to 99 rounds ret_1 p value                           recomputed=0.906089 reported=0.906089
+OK   players needed per group to see 0.5 point change        recomputed=95733.2 reported=96714
+OK   players needed per group to see 0.75 point change       recomputed=42327.6 reported=42984
+OK   power at the observed change (simulated versus formula) recomputed=0.87425 reported=0.885695
+
+45 of 45 comparisons match. ALL MATCH
